@@ -1,0 +1,86 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import sys
+import argparse
+import time
+import traceback
+
+from led_matrix.matrix import LEDMatrix
+from led_matrix.screen import Console,NcursesConsole
+from led_matrix.animation.animation import *
+from led_matrix.animation.meteo import *
+from led_matrix.animation.temperature import *
+from led_matrix.animation.fire import *
+from led_matrix.animation.matrix import *
+from led_matrix.animation.pacman import *
+from led_matrix.animation import *
+
+class Scene(object):
+    def __init__(self,application,delay=10,*args,**kargs):
+        self.application = application
+        self.delay = delay
+        self.app_args = args
+        self.app_kargs = kargs
+
+    def run(self,screen):
+        app = self.application(screen=screen,*self.app_args,**self.app_kargs)
+        app.run_bg()
+        time.sleep(self.delay)
+        app.stop()
+        app.wait_finished()
+
+class MatrixManager(object):
+    def __init__(self,scenario,screen=LEDMatrix):
+        self.scenario = scenario
+        self.screen = screen
+
+    def run(self):
+        while True:
+            for scene in self.scenario:
+                scene.run(self.screen)
+
+
+def get_scenario(config):
+    scenario = []
+
+    with open(config,"r") as f:
+        for line in f.readlines():
+            scene = eval(line)
+            scenario.append(scene)
+
+    return scenario
+
+
+def parse_args():
+    parser = argparse.ArgumentParser(description="Play animation with a LED Matrix")
+    parser.add_argument("config",metavar="CONFIG",nargs="?",help="List of python object that will be used")
+    parser.add_argument("--height","-H",metavar="HEIGHT",default=8,type=int,help="Height of the screen")
+    parser.add_argument("--width","-W",metavar="WIDTH",default=32,type=int,help="Width of the screen")
+    parser.add_argument("--screen","-S",metavar="SCREEN",default=Console,type=lambda x:eval(x),help="Screen to use")
+    return parser.parse_args()
+
+
+def main():
+    """ Entry Point Program """
+    args = parse_args()
+
+    scenario = get_scenario(args.config)
+
+    screen = args.screen(height=args.height,width=args.width)
+    manager = MatrixManager(scenario,screen=screen)
+
+    try:
+        manager.run()
+    except KeyboardInterrupt:
+        pass
+    except:
+        traceback.print_exc(file=sys.stdout)
+    finally:
+        screen.stop()
+
+    return 0
+
+
+if __name__ == "__main__":
+   sys.exit(main())
