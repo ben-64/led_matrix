@@ -138,7 +138,7 @@ class Clock(TextApplication):
         nb_seconds = int(datetime.now().strftime("%S"))
         pixel_for_seconds = 20
         step = int((self.second_screen.width-pixel_for_seconds)/2)
-        full = int((pixel_for_seconds*nb_seconds)/60)
+        full = int(((pixel_for_seconds+1)*nb_seconds)/60)
         for i in range(pixel_for_seconds):
             color = 0xFF if i<=full else 0x111111
             self.second_screen[(i+step,0)] = color
