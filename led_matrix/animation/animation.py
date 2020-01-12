@@ -112,12 +112,30 @@ class Date(ScrollText):
     def set_text(self):
         return datetime.now().strftime("%a %d %b")
 
+
+class BarTimer(object):
+    def __init__(self,screen,max_time=60,pixel_for_seconds=20,color=0xFF,bgcolor=0x111111):
+        self.screen = screen
+        self.color = color
+        self.bgcolor = bgcolor
+        self.max_time = max_time
+        self.pixel_for_seconds = pixel_for_seconds
+        self.step = int((self.screen.width-self.pixel_for_seconds)/2)
+
+    def update(self,current_time):
+        full = int(((self.pixel_for_seconds+1)*current_time)/self.max_time)
+        for i in range(self.pixel_for_seconds):
+            color = self.color if i<=full else self.bgcolor
+            self.screen[(i+self.step,0)] = color
+
+
 class Clock(TextApplication):
     def __init__(self,*args,**kargs):
         super().__init__(refresh=1,*args,**kargs)
         self.icon_screen = self.screen.extract_screen(0,0,8,self.screen.height)
         self.time_screen = self.screen.extract_screen(8,0,self.screen.width-8,self.screen.height-1)
         self.second_screen = self.screen.extract_screen(8,7,self.screen.width-8,1)
+        self.bartimer = BarTimer(self.second_screen)
 
 
     def set_icon(self):
@@ -136,12 +154,7 @@ class Clock(TextApplication):
 
         # Seconds
         nb_seconds = int(datetime.now().strftime("%S"))
-        pixel_for_seconds = 20
-        step = int((self.second_screen.width-pixel_for_seconds)/2)
-        full = int(((pixel_for_seconds+1)*nb_seconds)/60)
-        for i in range(pixel_for_seconds):
-            color = 0xFF if i<=full else 0x111111
-            self.second_screen[(i+step,0)] = color
+        self.bartimer.update(nb_seconds)
 
         self.screen.render()
 
