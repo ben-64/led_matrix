@@ -11,6 +11,7 @@ from led_matrix.screen import *
 from led_matrix.fonts.font4x5 import Font4x5
 from led_matrix.fonts.adafruit import AdaFruit
 
+
 class Application(Thread):
     def __init__(self,screen=Console(),refresh=60):
         super().__init__()
@@ -56,10 +57,12 @@ class Application(Thread):
     def wait_finished(self):
         self.join()
 
+
 class SwitchOff(Application):
     def run(self):
         self.screen.colorwipe()
         self.screen.render()
+
 
 class TextApplication(Application):
     def text_screen(self):
@@ -73,8 +76,9 @@ class TextApplication(Application):
             self.text_screen().text(text,x,y,color,font,space)
         self.screen.render()
 
+
 class ScrollText(TextApplication):
-    def __init__(self,speed=0.5,letter_by_letter=True,*args,**kargs):
+    def __init__(self,if_needed=True,speed=0.5,letter_by_letter=True,infinite=False,*args,**kargs):
         super().__init__(*args,**kargs)
         self.letter_by_letter = letter_by_letter
         self.indice_start = 0
@@ -82,15 +86,23 @@ class ScrollText(TextApplication):
         self.x = 0
         self.font = Font4x5()
         self.speed = speed
+        self.if_needed = if_needed
+        self.infinite = infinite
 
     def set_text(self):
         return "Scrolling text"
 
     def update(self):
         text = self.set_text()
+        if self.font.width(text,1) > self.text_screen().width:
+            self.scroll(text)
+        else:
+            self.print_text(text,center=True,font=self.font,space=1)
 
-        while not self.stop_received:
-            self.print_text(text[self.indice_start:self.indice_end],center=False,x=self.x,font=self.font)
+    def scroll(self,text):
+        stop = False
+        while not self.stop_received and not stop:
+            self.print_text(text[self.indice_start:self.indice_end],center=False,x=self.x,font=self.font,space=1)
             if not self.letter_by_letter or self.indice_end is None:
                 self.indice_start += 1
                 if self.indice_start > len(text):
@@ -105,9 +117,13 @@ class ScrollText(TextApplication):
                     self.indice_start = 1
                     self.indice_end = None
                     self.x = 0
+                    if not self.infinite:
+                        stop = True
 
             time.sleep(self.speed)
-            
+
+
+
 class Date(ScrollText):
     def set_text(self):
         return datetime.now().strftime("%a %d %b")
@@ -136,7 +152,6 @@ class Clock(TextApplication):
         self.time_screen = self.screen.extract_screen(8,0,self.screen.width-8,self.screen.height-1)
         self.second_screen = self.screen.extract_screen(8,7,self.screen.width-8,1)
         self.bartimer = BarTimer(self.second_screen)
-
 
     def set_icon(self):
         for x in range(self.icon_screen.width):
