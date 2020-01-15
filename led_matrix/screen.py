@@ -244,7 +244,7 @@ class Screen(object):
 
     def center_text(self,text,color,font=AdaFruit(),space=1):
         text_width = font.width(text)
-        x = int((self.width - font.width(text))/2)
+        x = int((self.width - font.width(text,space))/2)
         y = int((self.height - font.HEIGHT)/2)
         self.text(text,x,y,color,font,space)
 

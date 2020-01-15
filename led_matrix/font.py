@@ -25,9 +25,9 @@ class GLCDFont(Font):
                 if (line >> char_y) & 0x1:
                     framebuffer.pixel(x + char_x, y + char_y, color)
 
-    def width(self, text):
+    def width(self, text, space=2):
         """Return the pixel width of the specified text message."""
-        return len(text) * (self.WIDTH)
+        return len(text) * (self.WIDTH) + space*len(text)
 
     def __getitem__(self,i):
         return self.FONT[ord(i)*self.WIDTH:ord(i)*(self.WIDTH+1)]
