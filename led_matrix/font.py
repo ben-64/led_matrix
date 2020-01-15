@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 
 class Font(object):
+    def __init__(self,space=1):
+        self.space = space
+
     def draw_char(self, char, x, y, framebuffer, color):
         raise NotImplementedError()
 
@@ -25,9 +28,9 @@ class GLCDFont(Font):
                 if (line >> char_y) & 0x1:
                     framebuffer.pixel(x + char_x, y + char_y, color)
 
-    def width(self, text, space=2):
+    def width(self, text):
         """Return the pixel width of the specified text message."""
-        return len(text) * (self.WIDTH) + space*len(text)
+        return len(text) * (self.WIDTH) + self.space*len(text)
 
     def __getitem__(self,i):
         return self.FONT[ord(i)*self.WIDTH:ord(i)*(self.WIDTH+1)]

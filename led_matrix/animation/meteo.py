@@ -28,6 +28,6 @@ class OpenWeatherData(TextApplication):
         j = json.loads(x.read().decode("utf-8"))
         weather,temp =  j["weather"][0]["icon"][:-1],j["main"]["temp"]
         self.set_icon(self.METEO_ICON.get(weather,SUN))
-        self.print_text("%u°" % int(float(temp)),font=AdaFruit(),space=2)
+        self.print_text("%u°" % int(float(temp)),font=AdaFruit(2))
 
 

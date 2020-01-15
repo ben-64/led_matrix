@@ -29,5 +29,5 @@ class Temperature(TextApplication):
         temp = j["result"][0]["Temp"]
         if not self.icon is None:
             self.icon_screen.center_text(self.icon,color=self.color,font=AdaFruit())
-        self.data_screen.center_text("%.1f" % temp,color=0xFFFFFF,font=Font4x5(),space=0)
+        self.data_screen.center_text("%.1f" % temp,color=0xFFFFFF,font=Font4x5(0))
         self.screen.render()

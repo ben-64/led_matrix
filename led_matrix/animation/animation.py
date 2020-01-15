@@ -68,12 +68,12 @@ class TextApplication(Application):
     def text_screen(self):
         return self.data_screen if hasattr(self,"data_screen") else self.screen
 
-    def print_text(self,text,color=0xFFFFFF,font=Font4x5(),space=0,x=0,y=0,center=True):
+    def print_text(self,text,color=0xFFFFFF,font=Font4x5(0),x=0,y=0,center=True):
         self.text_screen().fill(self.screen.DEFAULT_COLOR)
         if center:
-            self.text_screen().center_text(text,color,font=font,space=space)
+            self.text_screen().center_text(text,color,font=font)
         else:
-            self.text_screen().text(text,x,y,color,font,space)
+            self.text_screen().text(text,x,y,color,font)
         self.screen.render()
 
 
@@ -94,15 +94,15 @@ class ScrollText(TextApplication):
 
     def update(self):
         text = self.set_text()
-        if self.font.width(text,1) > self.text_screen().width:
+        if self.font.width(text) > self.text_screen().width:
             self.scroll(text)
         else:
-            self.print_text(text,center=True,font=self.font,space=1)
+            self.print_text(text,center=True,font=self.font)
 
     def scroll(self,text):
         stop = False
         while not self.stop_received and not stop:
-            self.print_text(text[self.indice_start:self.indice_end],center=False,x=self.x,font=self.font,space=1)
+            self.print_text(text[self.indice_start:self.indice_end],center=False,x=self.x,font=self.font)
             if not self.letter_by_letter or self.indice_end is None:
                 self.indice_start += 1
                 if self.indice_start > len(text):
@@ -160,12 +160,12 @@ class Clock(TextApplication):
                 else: color = 0xFFFFFF
                 self.icon_screen[(x,y)] = color
         day = datetime.now().strftime("%d").lstrip("0")
-        self.icon_screen.hcenter_text(day,color=0,font=Font4x5(),y=2,space=0)
+        self.icon_screen.hcenter_text(day,color=0,font=Font4x5(0),y=2)
 
     def update(self):
         # Time
         self.time_screen.fill(self.screen.DEFAULT_COLOR)
-        self.time_screen.center_text(datetime.now().strftime("%H:%M"),color=0xFFFFFF,font=Font4x5(),space=0)
+        self.time_screen.center_text(datetime.now().strftime("%H:%M"),color=0xFFFFFF,font=Font4x5(0))
 
         # Seconds
         nb_seconds = int(datetime.now().strftime("%S"))

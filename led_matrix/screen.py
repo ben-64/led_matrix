@@ -227,26 +227,26 @@ class Screen(object):
                     self[(i,j)] = backup[abs(delta_x)*self.height+i+j*self.width]
 
 
-    def text(self, string, x, y, color, font=AdaFruit(), space=1):
+    def text(self, string, x, y, color, font=AdaFruit()):
         w = font.WIDTH
         for i, char in enumerate(string):
-            font.draw_char(char=char,x=x + (i * (w+space)),y=y,framebuffer=self,color=color)
+            font.draw_char(char=char,x=x + (i * (w+font.space)),y=y,framebuffer=self,color=color)
 
-    def vcenter_text(self,text,color,x=0,font=AdaFruit(),space=1):
+    def vcenter_text(self,text,color,x=0,font=AdaFruit()):
         text_width = font.width(text)
         y = int((self.height - font.HEIGHT)/2)
-        self.text(text,x,y,color,font,space)
+        self.text(text,x,y,color,font)
 
-    def hcenter_text(self,text,color,y=0,font=AdaFruit(),space=1):
+    def hcenter_text(self,text,color,y=0,font=AdaFruit()):
         text_width = font.width(text)
         x = int((self.width - font.width(text))/2)
-        self.text(text,x,y,color,font,space)
+        self.text(text,x,y,color,font)
 
-    def center_text(self,text,color,font=AdaFruit(),space=1):
+    def center_text(self,text,color,font=AdaFruit()):
         text_width = font.width(text)
-        x = int((self.width - font.width(text,space))/2)
+        x = int((self.width - font.width(text))/2)
         y = int((self.height - font.HEIGHT)/2)
-        self.text(text,x,y,color,font,space)
+        self.text(text,x,y,color,font)
 
     def image(self,img,sx=0,sy=0):
         side = int(math.sqrt(len(img)))
