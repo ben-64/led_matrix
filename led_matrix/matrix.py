@@ -21,7 +21,11 @@ class LEDMatrix(Screen):
         self.dma_num = 10
         self.gpio = gpio
         self.invert = 0
-        self.leds = ws.new_ws2811_t()
+        try:
+            self.leds = ws.new_ws2811_t()
+        except NameError:
+            print("Driver missing")
+            sys.exit(1)
         self.init()
 
     def init(self):
