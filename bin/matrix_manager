@@ -6,7 +6,7 @@ import argparse
 import time
 import traceback
 
-from led_matrix.matrix import LEDMatrix
+from led_matrix.matrix import *
 from led_matrix.screen import Console,NcursesConsole
 from led_matrix.animation.animation import *
 from led_matrix.animation.meteo import *

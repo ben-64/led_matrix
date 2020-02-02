@@ -85,3 +85,11 @@ class LEDMatrix(Screen):
         if resp != ws.WS2811_SUCCESS:
             message = ws.ws2811_get_return_t_str(resp)
             raise RuntimeError('ws2811_render failed with code {0} ({1})'.format(resp, message))
+
+
+class NeoPixel(LEDMatrix):
+    def __init__(self,height=8,width=8,brightness=50,gpio=18):
+        super().__init__(height,width,brightness,gpio)
+        
+    def compute_index(self,i,j):
+        return j*self.height+i
