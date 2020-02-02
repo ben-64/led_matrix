@@ -56,7 +56,7 @@ class Fire2(Animation):
         else:
             heatramp |= 0xFFFF00
 
-        self.screen.set_pixel(x,y,heatramp)
+        self.screen[(x,y)] = heatramp
         
     def fire_line(self,cooling,sparkling,speeddelay,line):
         dir = 1
