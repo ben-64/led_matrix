@@ -73,7 +73,7 @@ class Fire2(Animation):
 
         if random.randint(0,255) < sparkling:
             y = random.randint(0,4)
-            self.heat[line][y] - random.randint(120,160)
+            self.heat[line][y] = random.randint(120,160)
 
         for i in range(0,self.screen.width,dir):
             self.set_pixel_heat(i,line,self.heat[line][i])
