@@ -10,6 +10,6 @@ setup(
     long_description=long_description,
     author='ben64',
     author_email='ben64@time0ut.org',
-    packages=['led_matrix','led_matrix/fonts','led_matrix/animation'],
+    packages=['led_matrix','led_matrix/tools','led_matrix/fonts','led_matrix/animation','led_matrix/screens'],
     scripts=["bin/matrix_animation","bin/led_matrix","bin/matrix_manager"]
 )

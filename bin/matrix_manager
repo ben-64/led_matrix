@@ -6,8 +6,7 @@ import argparse
 import time
 import traceback
 
-from led_matrix.matrix import *
-from led_matrix.screen import Console,NcursesConsole
+import led_matrix.screens
 from led_matrix.animation.animation import *
 from led_matrix.animation.meteo import *
 from led_matrix.animation.temperature import *
@@ -15,6 +14,8 @@ from led_matrix.animation.fire import *
 from led_matrix.animation.matrix import *
 from led_matrix.animation.pacman import *
 from led_matrix.animation import *
+
+led_matrix.screens.load_classes(globals())
 
 class Scene(object):
     def __init__(self,application,delay=10,*args,**kargs):

@@ -8,7 +8,7 @@ try:
 except:
     print("No driver for ws281x")
 
-from led_matrix.screen import Screen
+from led_matrix.screens.screen import Screen
 
 class LEDMatrix(Screen):
     DEFAULT_COLOR = 0

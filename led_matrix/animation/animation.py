@@ -7,7 +7,7 @@ import random
 from threading import Thread
 from datetime import datetime
 
-from led_matrix.screen import *
+from led_matrix.screens.console import Console
 from led_matrix.fonts.font4x5 import Font4x5
 from led_matrix.fonts.adafruit import AdaFruit
 
