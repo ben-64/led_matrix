@@ -3,7 +3,7 @@
 import sys
 import math
 from led_matrix.fonts.adafruit import AdaFruit
-
+from led_matrix.image import Image
 
 class Screen(object):
     DEFAULT_COLOR = 0
@@ -244,10 +244,9 @@ class Screen(object):
         self.text(text,x,y,color,font)
 
     def image(self,img,sx=0,sy=0):
-        side = int(math.sqrt(len(img)))
-        for i in range(side):
-            for j in range(side):
-                self[(sx+i,sy+j)] = img[i+j*side]
+        for i in img.width:
+            for j in img.height:
+                self[(sx+i,sy+j)] = img[i,j]
 
     def extract_screen(self,x,y,width,height):
         return Screen(width,height,x,y,self)
