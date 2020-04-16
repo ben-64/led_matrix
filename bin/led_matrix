@@ -7,6 +7,7 @@ import time
 import traceback
 
 import led_matrix.screens
+from led_matrix.image import Image
 from led_matrix.fonts.font4x5 import Font4x5
 from led_matrix.fonts.adafruit import AdaFruit
 
@@ -65,7 +66,7 @@ def main():
     elif args.fill_rectangle:
         screen.fill_rect(args.x,args.y,args.figure_height,args.figure_width,args.color)
     elif args.img:
-        screen.image(args.img)
+        screen.image(SquareImage(args.img))
 
     screen.render()
 
