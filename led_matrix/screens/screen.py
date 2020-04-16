@@ -244,8 +244,8 @@ class Screen(object):
         self.text(text,x,y,color,font)
 
     def image(self,img,sx=0,sy=0):
-        for i in img.width:
-            for j in img.height:
+        for i in range(img.width):
+            for j in range(img.height):
                 self[(sx+i,sy+j)] = img[i,j]
 
     def extract_screen(self,x,y,width,height):
