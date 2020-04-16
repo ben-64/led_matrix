@@ -123,26 +123,23 @@ class ScrollText(TextApplication):
             time.sleep(self.speed)
 
 
-
 class Date(ScrollText):
     def set_text(self):
         return datetime.now().strftime("%a %d %b")
 
 
-class BarTimer(object):
-    def __init__(self,screen,max_time=60,pixel_for_seconds=20,color=0xFF,bgcolor=0x111111):
+class ProgressBar(object):
+    def __init__(self,screen,max_value,color=0xFF,bgcolor=0x111111):
         self.screen = screen
         self.color = color
         self.bgcolor = bgcolor
-        self.max_time = max_time
-        self.pixel_for_seconds = pixel_for_seconds
-        self.step = int((self.screen.width-self.pixel_for_seconds)/2)
+        self.max_value = max_value
 
-    def update(self,current_time):
-        full = int(((self.pixel_for_seconds+1)*current_time)/self.max_time)
-        for i in range(self.pixel_for_seconds):
-            color = self.color if i<=full else self.bgcolor
-            self.screen[(i+self.step,0)] = color
+    def update(self,value):
+        full = int(self.screen.width*value/(self.max_value-1))
+        for i in range(self.screen.width):
+            color = self.color if i<full else self.bgcolor
+            self.screen[(i,0)] = color
 
 
 class Clock(TextApplication):
@@ -151,7 +148,7 @@ class Clock(TextApplication):
         self.icon_screen = self.screen.extract_screen(0,0,8,self.screen.height)
         self.time_screen = self.screen.extract_screen(8,0,self.screen.width-8,self.screen.height-1)
         self.second_screen = self.screen.extract_screen(8,7,self.screen.width-8,1)
-        self.bartimer = BarTimer(self.second_screen)
+        self.bartimer = ProgressBar(self.second_screen,60)
 
     def set_icon(self):
         for x in range(self.icon_screen.width):
