@@ -6,9 +6,10 @@ from led_matrix.tools.proto import UDPClient
 
 
 class NetworkScreen(Screen):
-    def __init__(self,net=UDPClient("127.0.0.1",64243),*args,**kargs):
+    """ Simulate a screen sending pixel change to the network """
+    def __init__(self,dst="127.0.0.1",port=64244,*args,**kargs):
         super().__init__(*args,**kargs)
-        self.net = net
+        self.net = UDPClient(dst,port)
 
     def compute_index(self,x,y):
         return y*self.get_real_width()+x
