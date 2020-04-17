@@ -4,19 +4,18 @@
 import sys
 
 class Image(object):
-    def __init__(self,data,width,height):
-        self.img = data
-        self.load_color()
+    def __init__(self,data,width,height,color={1:0xFFFFFF}):
+        self.data = self.load_color(data,color)
         self.width = width
         self.height = height
 
     def __getitem__(self,i):
         return self.data[self.from_coord(i[0],i[1])]
 
-    def load_color(self,color={1:0xFFFFFF}):
+    def load_color(self,data,color={1:0xFFFFFF}):
         if type(color) is int:
             color = {1:color}
-        self.data = [color.get(x,x) for x in self.img]
+        return [color.get(x,x) for x in data]
 
     def display(self):
         for j in range(self.height):
@@ -68,9 +67,9 @@ class SquareImage(Image):
 
 
 class ImageStr(Image):
-    def __init__(self,s,pattern={"#":1}):
+    def __init__(self,s,pattern={"#":1},color={1:0xFFFFFF}):
         data,width,height = self.load_str(s,pattern)
-        super().__init__(data,width,height)
+        super().__init__(data,width,height,color)
 
     def load_str(self,s,replace):
         r = []

@@ -33,13 +33,6 @@ class Sprite(object):
         self.get().display()
 
 
-class ColorSprite(Sprite):
-    def __init__(self,images,color):
-        for image in images:
-            image.load_color(color)
-        super().__init__(images)
-
-
 class MultipleSprite(Sprite):
     """ Set of sprite, to concatenate animations """
     def __init__(self,sprites,space=1):
