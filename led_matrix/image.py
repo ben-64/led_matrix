@@ -80,3 +80,11 @@ class ImageStr(Image):
             for c in line:
                 r.append(replace.get(c,0))
         return r,width,height
+
+
+class StaticImage(ImageStr):
+    IMAGE = ""
+    def __init__(self,pattern={"#":1},color={1:0xFFFFFF}):
+        super().__init__(self.IMAGE,pattern,color)
+
+    

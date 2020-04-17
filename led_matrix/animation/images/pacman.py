@@ -2,9 +2,10 @@
 # -*- coding: utf-8 -*-
 
 from led_matrix.animation.sprite import Sprite
-from led_matrix.image import ImageStr
+from led_matrix.image import StaticImage
 
-_PACMAN_CLOSE = \
+class PACMAN_CLOSE(StaticImage):
+    IMAGE = \
 """........
 ..####..
 .###.##.
@@ -14,7 +15,9 @@ _PACMAN_CLOSE = \
 .######.
 ..####.."""
 
-_PACMAN_OPEN = \
+
+class PACMAN_OPEN(StaticImage):
+    IMAGE = \
 """........
 ..####..
 .###.##.
@@ -27,10 +30,11 @@ _PACMAN_OPEN = \
 
 class Pacman(Sprite):
     def __init__(self,color=0xFFFF00):
-        images = [ImageStr(_PACMAN_CLOSE,color=color),ImageStr(_PACMAN_OPEN,color=color)]
+        images = [PACMAN_CLOSE(color=color),PACMAN_OPEN(color=color)]
         super().__init__(images=images)
 
-_GHOST = \
+class GHOST(StaticImage): 
+    IMAGE = \
 """.......
 .#####.
 #######
@@ -43,5 +47,5 @@ _GHOST = \
 
 class Ghost(Sprite):
     def __init__(self,color=0xFF):
-        images = [ImageStr(_GHOST,{"#":1,"*":0xFFFFFF},color)]
+        images = [GHOST({"#":1,"*":0xFFFFFF},color)]
         super().__init__(images=images)
