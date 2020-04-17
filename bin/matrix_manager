@@ -6,7 +6,7 @@ import argparse
 import time
 import traceback
 
-import led_matrix.screens
+from led_matrix.tools.cmdline import get_screen
 from led_matrix.animation.animation import *
 from led_matrix.animation.meteo import *
 from led_matrix.animation.temperature import *
@@ -14,8 +14,6 @@ from led_matrix.animation.fire import *
 from led_matrix.animation.matrix import *
 from led_matrix.animation.pacman import *
 from led_matrix.animation import *
-
-led_matrix.screens.load_classes(globals())
 
 class Scene(object):
     def __init__(self,application,delay=10,*args,**kargs):
@@ -56,9 +54,7 @@ def get_scenario(config):
 def parse_args():
     parser = argparse.ArgumentParser(description="Play animation with a LED Matrix")
     parser.add_argument("config",metavar="CONFIG",nargs="?",help="List of python object that will be used")
-    parser.add_argument("--height","-H",metavar="HEIGHT",default=8,type=int,help="Height of the screen")
-    parser.add_argument("--width","-W",metavar="WIDTH",default=32,type=int,help="Width of the screen")
-    parser.add_argument("--screen","-S",metavar="SCREEN",default=Console,type=lambda x:eval(x),help="Screen to use")
+    parser.add_argument("--screen","-S",metavar="SCREEN",default="Console()",help="Screen to use")
     return parser.parse_args()
 
 
@@ -68,7 +64,7 @@ def main():
 
     scenario = get_scenario(args.config)
 
-    screen = args.screen(height=args.height,width=args.width)
+    screen = get_screen(args.screen)
     manager = MatrixManager(scenario,screen=screen)
 
     try:

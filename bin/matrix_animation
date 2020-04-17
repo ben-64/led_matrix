@@ -6,55 +6,24 @@ import argparse
 import time
 import traceback
 
-import led_matrix.screens
-from led_matrix.animation import *
+from led_matrix.tools.cmdline import get_screen,get_animation
 
-led_matrix.screens.load_classes(globals())
-
-def load_animations():
-    animations = get_all_subclasses(animation.Application)
-    for anim in animations:
-        globals()[anim.__name__] = anim
-
-def get_all_subclasses(cls):
-    all_subclasses = []
-
-    for subclass in cls.__subclasses__():
-        all_subclasses.append(subclass)
-        all_subclasses.extend(get_all_subclasses(subclass))
-
-    return all_subclasses
-
-def find_app(app,screen):
-    """ Horrible hack to set the screen and run instantiate the application
-    Won't work in many cases... but still enough to test """
-    apps = get_all_subclasses(animation.Application)
-    try:
-        index = app.find('(')
-        app = app[:index+1] + "screen=screen," + app[index+1:]
-        return eval(app)
-    except:
-        print("Unable to find application %s : Possible values: %s" % (app,",".join([x.__name__ for x in apps])))
-        sys.exit(1)
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Play animation with a LED Matrix")
-    parser.add_argument("--height","-H",metavar="HEIGHT",default=8,type=int,help="Height of the screen")
-    parser.add_argument("--width","-W",metavar="WIDTH",default=32,type=int,help="Width of the screen")
-    parser.add_argument("--screen","-S",metavar="SCREEN",default=Console,type=lambda x:eval(x),help="Screen to use")
+    parser.add_argument("--screen","-S",metavar="SCREEN",default="Console()",help="Screen to use")
     parser.add_argument("--application","-A",metavar="APPLICATION",default="Clock",help="Application to run")
     return parser.parse_args()
 
 
 def main():
     """ Entry Point Program """
-    load_animations()
     args = parse_args()
 
-    screen = args.screen(height=args.height,width=args.width)
+    screen = get_screen(args.screen)
 
     try:
-        app = find_app(args.application,screen)
+        app = get_animation(args.application,screen)
         app.run()
     except KeyboardInterrupt:
         pass
