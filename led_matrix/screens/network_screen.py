@@ -7,7 +7,7 @@ from led_matrix.tools.proto import UDPClient
 
 class NetworkScreen(Screen):
     """ Simulate a screen sending pixel change to the network """
-    def __init__(self,dst="127.0.0.1",port=64244,*args,**kargs):
+    def __init__(self,dst="127.0.0.1",port=64240,*args,**kargs):
         super().__init__(*args,**kargs)
         self.net = UDPClient(dst,port)
 

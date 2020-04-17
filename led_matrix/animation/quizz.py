@@ -30,7 +30,7 @@ class Quizz(ScrollText):
 
 
 class NetworkThread(Thread):
-    def __init__(self,queue,port=64240):
+    def __init__(self,queue,port=64241):
         super().__init__()
         self.port = port
         self.sock = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
@@ -48,7 +48,7 @@ class NetworkThread(Thread):
 
 
 class NetQuizz(Application):
-    def __init__(self,conf,port=64243,timeout=5,*args,**kargs):
+    def __init__(self,conf,port=64241,timeout=5,*args,**kargs):
         super().__init__(refresh=1,*args,**kargs)
         self.timeout = timeout
         self.queue = queue.Queue(maxsize=10)

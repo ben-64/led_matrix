@@ -5,9 +5,9 @@ from led_matrix.animation.animation import Application
 from led_matrix.tools.proto import UDPServer
 
 class NetworkAppli(Application):
-    def __init__(self,net=UDPServer(),*args,**kargs):
+    def __init__(self,port=64240,*args,**kargs):
         super().__init__(*args,**kargs)
-        self.net = net
+        self.net = UDPServer(port)
 
     def to_coord(self,index):
         x = index%self.screen.width
