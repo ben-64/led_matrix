@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-from os.path import dirname, basename, isfile, join
-import glob
-modules = glob.glob(join(dirname(__file__), "*.py"))
-__all__ = [ basename(f)[:-3] for f in modules if isfile(f) and not f.endswith('__init__.py')]
+
+from led_matrix.tools.importer import add_classes_to_globals
+from led_matrix.animation.animation import Application
+
+load_classes = add_classes_to_globals(__file__,__name__,lambda c:issubclass(c,Application))
