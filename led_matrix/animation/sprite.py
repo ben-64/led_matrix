@@ -9,9 +9,14 @@ from led_matrix.image import Image
 class Sprite(object):
     """ Set of images """
     def __init__(self,images=None):
-        self.images = images if images else self.IMAGES
-        self.width = images[0].width
-        self.height = images[0].height
+        if images is None:
+            self.images = self.IMAGES
+        elif type(images) is list:
+            self.images = images
+        else:
+            self.images = [images]
+        self.width = self.images[0].width
+        self.height = self.images[0].height
         self.current_image = 0
 
     def next(self):
@@ -36,6 +41,7 @@ class Sprite(object):
 class MultipleSprite(Sprite):
     """ Set of sprite, to concatenate animations """
     def __init__(self,sprites,space=1):
+        sprites = list(map(lambda x: Sprite(x) if isinstance(x,Image) else x,sprites))
         big_sprite = []
         greatest_number_of_sprites = max(map(len,sprites))
         for num_image in range(greatest_number_of_sprites):
@@ -50,9 +56,12 @@ class MultipleSprite(Sprite):
 
 class SpriteAnimation(Animation):
     """ Animation class to alternate between images of a Sprite """
-    def __init__(self,sprite,*args,**kargs):
-        super().__init__(refresh=0.1,*args,**kargs)
-        self.sprite = sprite
+    def __init__(self,sprite,refresh=0.2,*args,**kargs):
+        super().__init__(refresh=refresh,*args,**kargs)
+        if isinstance(sprite,Image):
+            self.sprite = Sprite(sprite)
+        else:
+            self.sprite = sprite
  
     def run(self):
         # Part of sprite
