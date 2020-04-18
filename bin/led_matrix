@@ -34,6 +34,7 @@ def parse_args():
     parser.add_argument("--screen","-S",metavar="SCREEN",default="Console()",help="Screen to use")
     parser.add_argument("--modulo",action="store_true",help="Scrolling is modulo")
     parser.add_argument("--img",metavar="IMG",type=lambda img:[int(x,0) for x in img.split(",")],help="Display Image")
+    parser.add_argument("--clear",action="store_true",help="Clear screen")
     return parser.parse_args()
 
 def main():
@@ -63,11 +64,13 @@ def main():
         screen.fill_rect(args.x,args.y,args.figure_height,args.figure_width,args.color)
     elif args.img:
         screen.image(SquareImage(args.img))
+    elif args.clear:
+        screen.fill(screen.DEFAULT_COLOR)
 
     screen.render()
 
     try:
-        while True:
+        while True and not args.clear:
             if args.scroll:
                 screen.scroll(args.scroll[0],args.scroll[1],modulo=args.modulo)
                 screen.render()
