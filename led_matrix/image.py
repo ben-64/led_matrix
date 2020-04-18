@@ -13,7 +13,9 @@ class Image(object):
         return self.data[self.from_coord(i[0],i[1])]
 
     def load_color(self,data,color={1:0xFFFFFF}):
-        if type(color) is int:
+        if color is None:
+            return data
+        elif type(color) is int:
             color = {1:color}
         return [color.get(x,x) for x in data]
 
@@ -58,7 +60,7 @@ class Image(object):
                 for i in range(img.width):
                     data.append(img[i,j])
         return Image(data,self.width+img.width+space,max(self.height,img.height))
- 
+
 
 class SquareImage(Image):
     def __init__(self,data):
@@ -84,7 +86,11 @@ class ImageStr(Image):
 
 class StaticImage(ImageStr):
     IMAGE = ""
-    def __init__(self,pattern={"#":1},color={1:0xFFFFFF}):
+    DEFAULT_COLOR = {1:0xFFFFFF}
+    DEFAULT_PATTERN = {"#":1}
+    def __init__(self,pattern=None,color=None):
+        color = color if color else self.DEFAULT_COLOR
+        pattern = pattern if pattern else self.DEFAULT_PATTERN
         super().__init__(self.IMAGE,pattern,color)
 
     
