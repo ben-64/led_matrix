@@ -3,7 +3,7 @@
 import sys
 import math
 from led_matrix.fonts.adafruit import AdaFruit
-from led_matrix.image import Image
+
 
 class Screen(object):
     DEFAULT_COLOR = 0

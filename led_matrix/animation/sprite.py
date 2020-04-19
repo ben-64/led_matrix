@@ -4,7 +4,7 @@
 import sys
 import time
 from led_matrix.animation.animation import Animation
-from led_matrix.image import Image
+from led_matrix.images.image import Image
 
 class Sprite(object):
     """ Set of images """
@@ -56,14 +56,35 @@ class MultipleSprite(Sprite):
 
 class SpriteAnimation(Animation):
     """ Animation class to alternate between images of a Sprite """
-    def __init__(self,sprite,refresh=0.2,*args,**kargs):
+    def __init__(self,sprite,direction=1,refresh=0.2,*args,**kargs):
         super().__init__(refresh=refresh,*args,**kargs)
         if isinstance(sprite,Image):
             self.sprite = Sprite(sprite)
         else:
             self.sprite = sprite
+        self.direction = direction
  
     def run(self):
+        if self.direction == 1:
+            self.move_right()
+        else:
+            self.inplace()
+
+    def inplace(self):
+        if len(self.sprite) > 1:
+            while True:
+                self.screen.image(self.sprite.get(),0,0)
+                self.sprite.next()
+                self.screen.render()
+                time.sleep(self.refresh)
+        else:
+            self.screen.image(self.sprite.get(),0,0)
+            self.sprite.next()
+            self.screen.render()
+            time.sleep(self.refresh)
+
+
+    def move_right(self):
         # Part of sprite
         for nb_col in range(1,self.sprite.width+1):
             column_start = self.sprite.width - nb_col

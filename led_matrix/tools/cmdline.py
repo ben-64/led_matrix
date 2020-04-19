@@ -27,15 +27,28 @@ def get_screen(screen):
 def get_animation(animation,screen):
     """ Return animation corresponding to string """
     import led_matrix.animation
+    import led_matrix.images
     from led_matrix.animation.sprite import MultipleSprite
-    from led_matrix.animation.images.pacman import Pacman,Ghost
     led_matrix.animation.load_classes(globals())
+    led_matrix.images.load_classes(globals())
     constructor = add_parameters(animation,["screen=screen"])
     try:
         return eval(constructor)
     except:
         apps = get_all_subclasses(Application)
         print("Unable to find application %s : Possible values: %s" % (animation,",".join([x.__name__ for x in apps])))
+        sys.exit(1)
+
+
+def get_image(image):
+    import led_matrix.images
+    led_matrix.images.load_classes(globals())
+    try:
+        return eval(image)
+    except:
+        images = get_all_subclasses(Image)
+        print("Unable to find Image %s : Possible values: %s" % (image,",".join([x.__name__ for x in images])))
+        raise
         sys.exit(1)
 
 

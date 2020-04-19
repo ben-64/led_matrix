@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from led_matrix.animation.sprite import Sprite
-from led_matrix.image import StaticImage
+from led_matrix.images.image import StaticImage
 
 class PACMAN_CLOSE(StaticImage):
     DEFAULT_COLOR = 0xFFFF00
