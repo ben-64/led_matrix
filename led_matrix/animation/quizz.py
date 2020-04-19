@@ -48,15 +48,17 @@ class NetworkThread(Thread):
 
 
 class NetQuizz(Application):
-    def __init__(self,conf,port=64241,timeout=5,*args,**kargs):
+    def __init__(self,conf,port=64241,timeout=5,wait_timeout=True,max_size_answser=None,*args,**kargs):
         super().__init__(refresh=1,*args,**kargs)
         self.timeout = timeout
         self.queue = queue.Queue(maxsize=10)
         self.net_thread = NetworkThread(self.queue,port)
         self.net_thread.start()
         self.question = None
+        self.max_size_answser = max_size_answser
+        self.wait_timeout = wait_timeout
         self.question_screen = self.screen.extract_screen(0,0,22,self.screen.height)
-        self.answser_screen = self.screen.extract_screen(22,0,10,self.screen.height)
+        self.answer_screen = self.screen.extract_screen(22,0,10,self.screen.height)
         self.load_conf(conf)
 
     def load_conf(self,conf):
@@ -79,7 +81,7 @@ class NetQuizz(Application):
     def set_question(self):
         self.question,self.answer = self.get_problem()
         self.print_text(self.question,self.question_screen,render=False)
-        self.print_text("",self.answser_screen,render=False)
+        self.print_text("",self.answer_screen,render=False)
         self.clear_old_answer()
         self.screen.render()
 
@@ -118,13 +120,14 @@ class NetQuizz(Application):
         while True:
             try:
                 start = time.time()
-                print("Wait for %r seconds" % remaining_time)
                 ans = self.queue.get(timeout=remaining_time).strip()
             except queue.Empty:
                 return answser
             else:
                 answser += ans
-                self.print_text(answser.decode("utf-8"),self.answser_screen,color=0xFF)
+                self.print_text(answser.decode("utf-8"),self.answer_screen,color=0xFF)
+                if (not self.wait_timeout and self.is_valid_answer(answser)) or (self.max_size_answser and len(answser) == self.max_size_answser):
+                    return answser
                 remaining_time -= int(time.time()-start)
 
     def set_right(self):
@@ -137,14 +140,15 @@ class NetQuizz(Application):
 
 
 class Challenge(NetQuizz):
-    def __init__(self,good_response=5,timeout=16,*args,**kargs):
+    def __init__(self,good_response=6,timeout=10,decrease=1,*args,**kargs):
         super().__init__(timeout=timeout,*args,**kargs)
         self.question_screen = self.screen.extract_screen(0,0,22,self.screen.height-2)
-        self.answser_screen = self.screen.extract_screen(22,0,10,self.screen.height-2)
+        self.answer_screen = self.screen.extract_screen(22,0,10,self.screen.height-2)
         self.progress_bar = ProgressBar(self.screen.extract_screen(3,6,self.screen.width-6,1),good_response)
         self.level = 1
         self.good_response_needed = good_response
         self.bad_response_needed = 2
+        self.decrease = decrease
         self.reset_counter()
 
     def reset_counter(self):
@@ -154,14 +158,14 @@ class Challenge(NetQuizz):
 
     def increase_level(self):
         self.level += 1
-        self.timeout -= 2
+        self.timeout -= self.decrease
         self.print_text("LvL %u" % self.level,self.screen,color=0xFFFF00)
         self.reset_counter()
         time.sleep(1)
 
     def decrease_level(self):
         self.level -= 1
-        self.timeout += 2
+        self.timeout += self.decrease
         self.print_text("LvL %u" % self.level,self.screen,color=0xFFFF00)
         self.reset_counter()
         time.sleep(1)
