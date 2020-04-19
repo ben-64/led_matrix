@@ -7,7 +7,6 @@ import time
 import traceback
 
 from led_matrix.tools.cmdline import get_screen
-from led_matrix.image import Image
 from led_matrix.fonts.font4x5 import Font4x5
 from led_matrix.fonts.adafruit import AdaFruit
 
