@@ -12,6 +12,9 @@ class Image(object):
     def __getitem__(self,i):
         return self.data[self.from_coord(i[0],i[1])]
 
+    def __len__(self):
+        return len(self.data)
+
     def load_color(self,data,color={1:0xFFFFFF}):
         if color is None:
             return data
