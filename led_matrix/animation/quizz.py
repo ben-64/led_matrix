@@ -10,7 +10,7 @@ from threading import Thread
 
 from led_matrix.fonts.font4x5 import Font4x5
 from led_matrix.fonts.adafruit import *
-from led_matrix.animation.animation import ScrollText,Application,ProgressBar
+from led_matrix.animation.animation import ScrollText,Application,ProgressBar,Bar
 
 
 class Quizz(ScrollText):
@@ -48,7 +48,7 @@ class NetworkThread(Thread):
 
 
 class NetQuizz(Application):
-    def __init__(self,conf,port=64241,timeout=5,wait_timeout=True,max_size_answser=None,*args,**kargs):
+    def __init__(self,conf=None,port=64241,timeout=5,wait_timeout=True,max_size_answser=None,*args,**kargs):
         super().__init__(refresh=1,*args,**kargs)
         self.timeout = timeout
         self.queue = queue.Queue(maxsize=10)
@@ -59,7 +59,8 @@ class NetQuizz(Application):
         self.wait_timeout = wait_timeout
         self.question_screen = self.screen.extract_screen(0,0,22,self.screen.height)
         self.answer_screen = self.screen.extract_screen(22,0,10,self.screen.height)
-        self.load_conf(conf)
+        if conf:
+            self.load_conf(conf)
 
     def load_conf(self,conf):
         with open(conf,"r") as f:
@@ -144,10 +145,14 @@ class Challenge(NetQuizz):
         super().__init__(timeout=timeout,*args,**kargs)
         self.question_screen = self.screen.extract_screen(0,0,22,self.screen.height-2)
         self.answer_screen = self.screen.extract_screen(22,0,10,self.screen.height-2)
-        self.progress_bar = ProgressBar(self.screen.extract_screen(3,6,self.screen.width-6,1),good_response)
-        self.level = 1
-        self.good_response_needed = good_response
+        self.bar_screen = self.screen.extract_screen(0,6,self.screen.width,2)
+        self.progress_bar = ProgressBar(self.screen.extract_screen(3,6,16,1),good_response)
         self.bad_response_needed = 2
+        self.error_bar = ProgressBar(self.screen.extract_screen(20,6,self.bad_response_needed-1,1),self.bad_response_needed,color=0xFF0000)
+        self.level = 1
+        self.lvl_bar = Bar(self.screen.extract_screen(22,6,10,1),color=0xFFFF00)
+        self.lvl_bar.update(self.level)
+        self.good_response_needed = good_response
         self.decrease = decrease
         self.reset_counter()
 
@@ -155,11 +160,13 @@ class Challenge(NetQuizz):
         self.current_good = 0
         self.current_error = 0
         self.progress_bar.update(self.current_good)
+        self.error_bar.update(self.current_error)
 
     def increase_level(self):
         self.level += 1
         self.timeout -= self.decrease
         self.print_text("LvL %u" % self.level,self.screen,color=0xFFFF00)
+        self.lvl_bar.update(self.level)
         self.reset_counter()
         time.sleep(1)
 
@@ -167,13 +174,20 @@ class Challenge(NetQuizz):
         self.level -= 1
         self.timeout += self.decrease
         self.print_text("LvL %u" % self.level,self.screen,color=0xFFFF00)
+        self.lvl_bar.update(self.level)
         self.reset_counter()
         time.sleep(1)
+
+    def refresh_bars(self):
+        self.bar_screen.fill(0) # Needed because bars does not take full space
+        self.progress_bar.update(self.current_good)
+        self.error_bar.update(self.current_error)
+        self.lvl_bar.update(self.level)
 
     def set_right(self):
         super().set_right()
         self.current_good += 1
-        self.progress_bar.update(self.current_good)
+        self.refresh_bars()
         if self.current_good == self.good_response_needed:
             time.sleep(1)
             self.increase_level()
@@ -181,7 +195,7 @@ class Challenge(NetQuizz):
     def set_wrong(self):
         super().set_wrong()
         self.current_error += 1
-        self.progress_bar.update(self.current_good)
+        self.refresh_bars()
         if self.current_error == self.bad_response_needed:
             time.sleep(1)
             self.decrease_level()
