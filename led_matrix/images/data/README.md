@@ -1,0 +1,3 @@
+- characters.png taken from https://twitter.com/johanvinet/status/635814153601597441
+- food.png taken from https://twitter.com/JUSTIN_CYR/status/634546317713391616
+- super_heroes.png taken from https://www.behance.net/gallery/32551489/8x8-100-superhero-faces-pico8-color-palette
