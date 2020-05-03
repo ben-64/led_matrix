@@ -128,6 +128,21 @@ class Date(ScrollText):
         return datetime.now().strftime("%a %d %b")
 
 
+class Bar(object):
+    """ A simple Bar that can be increased or decreased """
+    def __init__(self,screen,color=0xFF,bgcolor=0):
+        self.screen = screen
+        self.color = color
+        self.bgcolor = bgcolor
+
+    def update(self,value):
+        if value < 0: value = 0
+        for i in range(value):
+            self.screen[(i,0)] = self.color
+        for i in range(value,self.screen.width-1):
+            self.screen[(i,0)] = self.bgcolor
+
+
 class ProgressBar(object):
     def __init__(self,screen,max_value,color=0xFF,bgcolor=0x111111):
         self.screen = screen
