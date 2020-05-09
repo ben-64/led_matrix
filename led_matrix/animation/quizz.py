@@ -7,6 +7,7 @@ import json
 import socket
 import queue
 from threading import Thread
+import select
 
 from led_matrix.fonts.font4x5 import Font4x5
 from led_matrix.fonts.adafruit import *
@@ -34,7 +35,7 @@ class NetworkThread(Thread):
         super().__init__()
         self.port = port
         self.sock = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
-        self.stop = False
+        self.need_stop = False
         self.queue = queue
 
     def init(self):
@@ -42,9 +43,14 @@ class NetworkThread(Thread):
 
     def run(self):
         self.init()
-        while not self.stop:
-            data = self.sock.recv(4096)
-            self.queue.put(data,False)
+        while not self.need_stop:
+            ready = select.select([self.sock], [], [], 1)
+            if ready[0]:
+                data = self.sock.recv(4096)
+                self.queue.put(data,False)
+
+    def stop(self):
+        self.need_stop = True
 
 
 class NetQuizz(Application):
@@ -65,6 +71,10 @@ class NetQuizz(Application):
     def load_conf(self,conf):
         with open(conf,"r") as f:
             self.quizz = json.load(f)
+
+    def stop(self):
+        super().stop()
+        self.net_thread.stop()
 
     def print_text(self,text,screen,color=0xFFFFFF,render=True,font=Font4x5()):
         screen.fill(self.screen.DEFAULT_COLOR)

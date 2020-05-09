@@ -31,6 +31,7 @@ def main():
         print("something wrong happened")
         traceback.print_exc(file=sys.stdout)
     finally:
+        app.stop()
         screen.clear()
         screen.render()
         screen.stop()
