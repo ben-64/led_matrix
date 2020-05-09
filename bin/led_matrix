@@ -64,7 +64,7 @@ def main():
     elif args.img:
         screen.image(SquareImage(args.img))
     elif args.clear:
-        screen.fill(screen.DEFAULT_COLOR)
+        screen.clear()
 
     screen.render()
 

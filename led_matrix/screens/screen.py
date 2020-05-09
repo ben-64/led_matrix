@@ -72,6 +72,9 @@ class Screen(object):
         """Fill the entire FrameBuffer with the specified color."""
         self.fill_rect(0, 0, self.width, self.height, color)
 
+    def clear(self):
+        self.fill(self.DEFAULT_COLOR)
+
     def fill_rect(self, x, y, width, height, color):
         """Draw a rectangle at the given location, size and color. The ``fill_rect`` method draws
         both the outline and interior."""
