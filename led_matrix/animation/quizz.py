@@ -53,8 +53,28 @@ class NetworkThread(Thread):
         self.need_stop = True
 
 
+class BarThread(Thread):
+    """ Class handling a progress bar with a thread """
+    def __init__(self,bar,step=0.1):
+        super().__init__()
+        self.bar = bar
+        self.need_stop = False
+        self.step = step
+
+    def run(self):
+        total = 0
+        while not self.need_stop:
+            self.bar.update(total)
+            self.bar.screen.render()
+            total += self.step*10
+            time.sleep(self.step)
+
+    def stop(self):
+        self.need_stop = True
+
+
 class NetQuizz(Application):
-    def __init__(self,conf=None,port=64241,timeout=5,wait_timeout=True,max_size_answser=None,*args,**kargs):
+    def __init__(self,conf=None,port=64241,timeout=10,wait_timeout=True,max_size_answser=None,*args,**kargs):
         super().__init__(refresh=1,*args,**kargs)
         self.timeout = timeout
         self.queue = queue.Queue(maxsize=10)
@@ -72,9 +92,18 @@ class NetQuizz(Application):
         with open(conf,"r") as f:
             self.quizz = json.load(f)
 
+    def start_timeout_bar(self):
+        self.timeout_bar = ProgressBar(self.screen.extract_screen(0,7,self.screen.width,1),self.timeout*10-3,color=0x9999,bgcolor=0)
+        self.timeout_bar_thread = BarThread(self.timeout_bar)
+        self.timeout_bar_thread.start()
+
+    def stop_timeout_bar(self):
+        self.timeout_bar_thread.stop()
+
     def stop(self):
         super().stop()
         self.net_thread.stop()
+        self.timeout_bar_thread.stop()
 
     def print_text(self,text,screen,color=0xFFFFFF,render=True,font=Font4x5()):
         screen.fill(self.screen.DEFAULT_COLOR)
@@ -97,6 +126,7 @@ class NetQuizz(Application):
         self.screen.render()
 
     def validate_answer(self,answer):
+        self.stop_timeout_bar()
         if self.is_valid_answer(answer):
             self.set_right()
         else:
@@ -111,13 +141,9 @@ class NetQuizz(Application):
         return self.answer == answer
 
     def update(self):
-        if not self.question:
-            self.set_question()
-        else:
-            answer = self.get_answser()
-            self.question = None
-            self.validate_answer(answer)
-            self.set_question()
+        self.set_question()
+        answer = self.get_answser()
+        self.validate_answer(answer)
         
     def get_problem(self):
         problem = random.choice(self.quizz)
@@ -128,6 +154,7 @@ class NetQuizz(Application):
     def get_answser(self):
         remaining_time = self.timeout
         answser = b""
+        self.start_timeout_bar()
         while True:
             try:
                 start = time.time()
@@ -153,6 +180,8 @@ class NetQuizz(Application):
 class Challenge(NetQuizz):
     def __init__(self,good_response=6,timeout=10,decrease=1,*args,**kargs):
         super().__init__(timeout=timeout,*args,**kargs)
+
+        ## Screen is splitted into multiple small screen
         self.question_screen = self.screen.extract_screen(0,0,22,self.screen.height-2)
         self.answer_screen = self.screen.extract_screen(22,0,10,self.screen.height-2)
         self.bar_screen = self.screen.extract_screen(0,6,self.screen.width,2)
