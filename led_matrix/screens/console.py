@@ -13,7 +13,7 @@ except:
 class Console(Screen):
     DEFAULT_COLOR = "."
 
-    def render(self):
+    def raw_render(self):
         for j in range(self.height):
             for i in range(self.width):
                 index = self.compute_index(i,j)
@@ -78,7 +78,7 @@ if has_curses:
                 self.stop()
                 raise
 
-        def render(self):
+        def raw_render(self):
             try:
                 self.win.refresh()
             except:

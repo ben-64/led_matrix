@@ -2,6 +2,7 @@
 
 import sys
 import math
+from threading import RLock
 from led_matrix.fonts.adafruit import AdaFruit
 
 
@@ -13,6 +14,7 @@ class Screen(object):
         self.x = x
         self.y = y
         self.parent = parent
+        self.render_lock = RLock()
         if not self.parent:
             self.buf = [self.DEFAULT_COLOR]*self.height*self.width
 
@@ -277,7 +279,13 @@ class Screen(object):
         pass
 
     def render(self):
-        if self.parent: self.parent.render()
+        if self.parent:
+            self.parent.render()
+        else:
+            self.render_lock.acquire()
+            self.raw_render()
+            self.render_lock.release()
+
 
     def print_index(self,real=True):
         f = self.compute_index if real else lambda x,y:y*self.width+x

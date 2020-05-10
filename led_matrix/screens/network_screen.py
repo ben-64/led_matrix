@@ -18,5 +18,5 @@ class NetworkScreen(Screen):
         led = self.compute_index(x,y)
         self.net.add(led,color)
 
-    def render(self):
+    def raw_render(self):
         self.net.send()

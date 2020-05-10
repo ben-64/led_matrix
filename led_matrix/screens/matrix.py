@@ -80,7 +80,7 @@ class LEDMatrix(Screen):
         y = int(index/self.width)
         return self.compute_index(x,y)
 
-    def render(self):
+    def raw_render(self):
         resp = ws.ws2811_render(self.leds)
         if resp != ws.WS2811_SUCCESS:
             message = ws.ws2811_get_return_t_str(resp)
