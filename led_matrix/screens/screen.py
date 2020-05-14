@@ -41,7 +41,7 @@ class Screen(object):
         return self.get_buf()[self.compute_index(x,y)]
 
     def __setitem__(self,i,v):
-        if i[0] >= self.width or i[1] >= self.height:
+        if i[0] >= self.width or i[0] < 0 or i[1] >= self.height or i[1] < 0:
             return
         x,y = i[0]+self.x,i[1]+self.y
         self.get_buf()[self.compute_index(x,y)] = v
