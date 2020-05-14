@@ -105,7 +105,7 @@ class NetQuizz(Application):
         self.net_thread.stop()
         self.timeout_bar_thread.stop()
 
-    def print_text(self,text,screen,color=0xFFFFFF,render=True,font=Font4x5()):
+    def print_text(self,text,screen,color=0xFFFFFF,render=True,font=Font4x5(space=0)):
         screen.fill(self.screen.DEFAULT_COLOR)
         screen.center_text(text,color,font=font)
         if render: screen.render()
