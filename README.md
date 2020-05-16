@@ -5,4 +5,17 @@ LED Matrix toolz to display things either on a LED Matrix such as https://www.am
 ## Dependencies
 
 - https://github.com/rpi-ws281x/rpi-ws281x-python
-	- pip3 install install rpi_ws281x
+
+```bash
+pip3 install install rpi_ws281x
+```
+
+- Pillow
+
+```bash
+pip install pillow
+sudo apt install libtiff5 libopenjp2-7 
+```
+
+
+
