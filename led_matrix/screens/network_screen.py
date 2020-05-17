@@ -10,6 +10,7 @@ class NetworkScreen(Screen):
     def __init__(self,dst="127.0.0.1",port=64240,*args,**kargs):
         super().__init__(*args,**kargs)
         self.net = TCPClient(dst,port)
+        self.net.init()
 
     def compute_index(self,x,y):
         return y*self.get_real_width()+x
