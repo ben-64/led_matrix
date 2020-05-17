@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from led_matrix.animation.animation import Application
-from led_matrix.tools.proto import UDPServer,TCPServer
+from led_matrix.tools.proto import UDPServer,TCPServer,DisconnectError
 
 class NetworkAppli(Application):
     def __init__(self,port=64240,*args,**kargs):
@@ -17,7 +17,11 @@ class NetworkAppli(Application):
     def run(self):
         self.net.init()
         while True:
-            data = self.net.recv()
-            for led,color,delay in data:
-                self.screen[self.to_coord(led)] = color
+            try:
+                data = self.net.recv()
+            except DisconnectError:
+                self.screen.clear()
+            else:
+                for led,color,delay in data:
+                    self.screen[self.to_coord(led)] = color
             self.screen.render()
