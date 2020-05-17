@@ -44,6 +44,10 @@ class BinaryProtocol(Protocol):
         return res
 
 
+class DisconnectError(Exception):
+    pass
+
+
 class UDPClient(object):
     def __init__(self,ip,port=64241,proto=BinaryProtocol()):
         self.addr = (ip,port)
@@ -122,21 +126,28 @@ class TCPServer(object):
             if self.csock == None:
                 self.csock,addr = self.sock.accept()
             data = self.csock.recv(sz)
-            if len(data) <= 0: self.csock = None
+            if len(data) <= 0: raise DisconnectError
         except:
             self.csock = None
-            raise
+            raise DisconnectError
         return data
 
     def recv(self):
         data = b""
         
-        l = struct.unpack('<I',self.raw_recv(4))[0]
+        try:
+            l = struct.unpack('<I',self.raw_recv(4))[0]
+        except struct.error:
+            raise DisconnectError
 
         while len(data) != l:
             d = self.raw_recv(l-len(data))
             data += d
 
-        res = self.proto.get(data)
+        try:
+            res = self.proto.get(data)
+        except struct.error:
+            raise DisconnectError
+
         return res
 
