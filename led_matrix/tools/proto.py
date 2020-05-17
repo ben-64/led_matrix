@@ -127,6 +127,9 @@ class TCPServer(object):
                 self.csock,addr = self.sock.accept()
             data = self.csock.recv(sz)
             if len(data) <= 0: raise DisconnectError
+        except KeyboardInterrupt:
+            self.csock = None
+            raise
         except:
             self.csock = None
             raise DisconnectError
