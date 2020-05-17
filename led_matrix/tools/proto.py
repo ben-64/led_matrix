@@ -82,4 +82,56 @@ class UDPServer(object):
             d = self.raw_recv()
             data += d
 
+
+class TCPClient(object):
+    def __init__(self,ip,port=64241,proto=BinaryProtocol()):
+        self.addr = (ip,port)
+        self.proto = BinaryProtocol()
+        self.sock = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+
+    def init(self):
+        self.sock.connect(self.addr)
+
+    def add(self,led,color):
+        self.proto.add(led,color)
+
+    def send(self):
+        data = self.proto.commit()
+        if len(data) > 0:
+            self.sock.send(struct.pack("<I",len(data)))
+            self.sock.send(data)
+
+
+class TCPServer(object):
+    def __init__(self,port=64242,proto=BinaryProtocol()):
+        self.port = port
+        self.proto = proto
+        self.sock = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+        self.csock = None
+
+    def init(self):
+        self.sock.bind(("0.0.0.0",self.port))
+        self.sock.listen(1)
+
+    def raw_recv(self,sz):
+        while True:
+            try:
+                if self.csock = None:
+                    self.csock,addr = self.sock.accept()
+                data = self.csock.recv(sz)
+            except:
+                self.csock = None
+            else:
+                break
+        return data
+
+    def recv(self):
+        data = b""
+        
+        l = struct.unpack('<I',self.raw_recv(4))[0]
+
+        while len(data) != l:
+            d = self.raw_recv(l-len(data))
+            data += d
+
         return self.proto.get(data)

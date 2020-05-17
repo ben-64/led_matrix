@@ -2,12 +2,12 @@
 # -*- coding: utf-8 -*-
 
 from led_matrix.animation.animation import Application
-from led_matrix.tools.proto import UDPServer
+from led_matrix.tools.proto import UDPServer,TCPServer
 
 class NetworkAppli(Application):
     def __init__(self,port=64240,*args,**kargs):
         super().__init__(*args,**kargs)
-        self.net = UDPServer(port)
+        self.net = TCPServer(port)
 
     def to_coord(self,index):
         x = index%self.screen.width
