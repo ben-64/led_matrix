@@ -116,7 +116,7 @@ class TCPServer(object):
     def raw_recv(self,sz):
         while True:
             try:
-                if self.csock = None:
+                if self.csock == None:
                     self.csock,addr = self.sock.accept()
                 data = self.csock.recv(sz)
             except:
