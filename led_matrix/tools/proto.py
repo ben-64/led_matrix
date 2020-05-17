@@ -34,9 +34,13 @@ class BinaryProtocol(Protocol):
         sz = struct.calcsize(fmt)
         offset = len(res)*sz
         while offset != len(data):
-            info = struct.unpack_from(fmt,data,offset)
-            res.append(info)
-            offset = len(res)*sz
+            try:
+                info = struct.unpack_from(fmt,data,offset)
+            except:
+                return res
+            else:
+                res.append(info)
+                offset = len(res)*sz
         return res
 
 
@@ -114,22 +118,14 @@ class TCPServer(object):
         self.sock.listen(1)
 
     def raw_recv(self,sz):
-        out = False
-        while True:
-            try:
-                if self.csock == None:
-                    self.csock,addr = self.sock.accept()
-                data = self.csock.recv(sz)
-                if len(data) > 0:
-                    out = True
-                else:
-                    self.csock = None
-            except KeyboardInterrupt:
-                raise
-            except:
-                self.csock = None
-            else:
-                if out: break
+        try:
+            if self.csock == None:
+                self.csock,addr = self.sock.accept()
+            data = self.csock.recv(sz)
+            if len(data) <= 0: self.csock = None
+        except:
+            self.csock = None
+            raise
         return data
 
     def recv(self):
@@ -141,4 +137,6 @@ class TCPServer(object):
             d = self.raw_recv(l-len(data))
             data += d
 
-        return self.proto.get(data)
+        res = self.proto.get(data)
+        return res
+
