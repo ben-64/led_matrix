@@ -120,7 +120,10 @@ class TCPServer(object):
                 if self.csock == None:
                     self.csock,addr = self.sock.accept()
                 data = self.csock.recv(sz)
-                out = (len(data) > 0)
+                if len(data) > 0:
+                    out = True
+                else:
+                    self.csock = None
             except:
                 self.csock = None
             else:
