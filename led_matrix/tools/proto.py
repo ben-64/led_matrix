@@ -124,6 +124,8 @@ class TCPServer(object):
                     out = True
                 else:
                     self.csock = None
+            except KeyboardInterrupt:
+                raise
             except:
                 self.csock = None
             else:
