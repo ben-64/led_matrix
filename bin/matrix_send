@@ -1,0 +1,56 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import sys
+import argparse
+import time
+import traceback
+
+from led_matrix.tools.cmdline import get_screen,get_image
+from led_matrix.fonts.font4x5 import Font4x5
+from led_matrix.fonts.adafruit import AdaFruit
+
+def parse_args():
+    parser = argparse.ArgumentParser(description="Send information to a LED Matrix")
+    parser.add_argument("--screen","-S",metavar="SCREEN",default="Console()",help="Screen to use")
+    parser.add_argument("--text","-t",metavar="TEXT",default="",help="Text to display")
+    parser.add_argument("--icon","-i",metavar="ICON",help="Icon to display")
+    parser.add_argument("--color","-c",metavar="COLOR",default=0xFFFFFF,type=lambda x:int(x,0),help="COLOR")
+    parser.add_argument("--wait","-w",metavar="SECONDS",default=10,type=int,help="Wait before exit")
+    return parser.parse_args()
+
+def main():
+    """ Entry Point Program """
+    args = parse_args()
+
+    screen = get_screen(args.screen)
+    screen.fill(screen.DEFAULT_COLOR)
+
+    if args.icon:
+        icon = get_image(args.icon)
+        icon_screen = screen.extract_screen(0,0,icon.width,screen.height)
+        data_screen = screen.extract_screen(icon.width,0,screen.width-icon.width,screen.height)
+        icon_screen.image(icon)
+    else:
+        data_screen = screen
+    
+    data_screen.center_text(args.text,args.color,font=Font4x5(space=0))
+
+    screen.render()
+
+    cpt = 0
+    try:
+        while cpt < args.wait:
+            time.sleep(1)
+            cpt += 1
+    except KeyboardInterrupt:
+        pass
+    finally:
+        screen.clear()
+        screen.stop()
+
+    return 0
+
+
+if __name__ == "__main__":
+   sys.exit(main())
