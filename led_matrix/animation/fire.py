@@ -73,7 +73,7 @@ class MagicFire(Animation):
         self.screen[(x,y)] = color
 
 
-    def fire_line(self,cooling,sparkling,speeddelay,line):
+    def fire_line(self,cooling,sparkling,line):
         dir = 1
 
         # Cooldown
@@ -121,8 +121,6 @@ class MagicFire(Animation):
         for i in range(0,self.screen.width,dir):
             self.set_pixel_heat(i,line,self.heat[line][i])
 
-        self.screen.render()
-        time.sleep(speeddelay)
 
     def generate_heat(self):
         #return random.randrange(5,10)
@@ -132,14 +130,16 @@ class MagicFire(Animation):
         base_cooling = 220
 
         # If it's faster, congestion will occur at network level
-        speed_delay = 0.004
+        speed_delay = 0.03
 
         while not self.stop_received:
-            self.fire_line(base_cooling+50,0,speed_delay, 0);
-            self.fire_line(base_cooling+50,0,speed_delay, 1);
-            self.fire_line(base_cooling+30,0,speed_delay, 2);
-            self.fire_line(base_cooling+30,10,speed_delay, 3);
-            self.fire_line(base_cooling+15,30,speed_delay, 4);
-            self.fire_line(base_cooling+15,40,speed_delay, 5);
-            self.fire_line(base_cooling+5,80,speed_delay, 6);
-            self.fire_line(base_cooling+5,80,speed_delay, 7);
+            self.fire_line(base_cooling+50,0,0);
+            self.fire_line(base_cooling+50,0,1);
+            self.fire_line(base_cooling+30,0,2);
+            self.fire_line(base_cooling+30,10,3);
+            self.fire_line(base_cooling+15,30,4);
+            self.fire_line(base_cooling+15,40,5);
+            self.fire_line(base_cooling+5,80,6);
+            self.fire_line(base_cooling+5,80,7);
+            self.screen.render()
+            time.sleep(speed_delay)
