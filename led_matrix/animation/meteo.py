@@ -25,12 +25,13 @@ class OpenWeatherData(TextApplication):
         super().__init__(*args,**kargs)
         self.api_key = api_key
         self.city = city
+        self.font = AdaFruit(2)
 
     def update(self):
         x = urllib.request.urlopen("http://api.openweathermap.org/data/2.5/weather?APPID=%s&id=%s&units=metric" % (self.api_key,self.city))
         j = json.loads(x.read().decode("utf-8"))
         weather,temp =  j["weather"][0]["icon"][:-1],j["main"]["temp"]
         self.set_icon(Image(self.METEO_ICON.get(weather,SUN),8,8))
-        self.print_text("%u°" % int(float(temp)),font=AdaFruit(2))
+        self.print_text("%u°" % int(float(temp)))
 
 
