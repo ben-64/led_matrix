@@ -25,7 +25,6 @@ class Application(Thread):
             self.icon = getattr(self,"ICON")
         else:
             self.icon = None
-        print(self.icon)
 
     def run(self):
         self.set_icon()
@@ -206,7 +205,6 @@ class ExternalCommand(ScrollText):
         self.cmd = cmd
 
     def set_text(self):
-        print(self.cmd)
         return subprocess.check_output(self.cmd,shell=True).decode("utf-8").strip()
         
 
