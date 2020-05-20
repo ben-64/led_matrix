@@ -5,50 +5,131 @@ import sys
 import argparse
 import time
 import traceback
+from threading import Thread,Condition
 
-from led_matrix.tools.cmdline import get_screen
-from led_matrix.animation.animation import *
-from led_matrix.animation.meteo import *
-from led_matrix.animation.temperature import *
-from led_matrix.animation.fire import *
-from led_matrix.animation.matrix import *
-from led_matrix.animation.pacman import *
-from led_matrix.animation import *
+from led_matrix.animation.animation import Application
+from led_matrix.tools.cmdline import get_screen,get_animation
+from led_matrix.tools.proto import TCPServer,DisconnectError
+
+
+class ManagerNetworkAppli(Application):
+    """ Like a NetworkAppli, but with some callbacks """
+    def __init__(self,manager,port=64240,*args,**kargs):
+        super().__init__(*args,**kargs)
+        self.net = TCPServer(port)
+        self.manager = manager
+        self.running = False
+
+    def to_coord(self,index):
+        x = index%self.screen.width
+        y = int(index/self.screen.width)
+        return (x,y)
+
+    def run(self):
+        self.net.init()
+        while True:
+            try:
+                data = self.net.recv()
+                self.take_screen()
+            except DisconnectError:
+                self.screen.clear()
+                self.release_screen()
+            else:
+                for led,color,delay in data:
+                    self.screen[self.to_coord(led)] = color
+            self.screen.render()
+
+    def take_screen(self):
+        if not self.running:
+            self.manager.new_external_communication()
+            self.running = True
+
+    def release_screen(self):
+        if self.running:
+            self.running = False
+            self.manager.stop_external_communication()
+        
+
+class ThreadNetworkAppli(Thread):
+    """ Thread waiting for an external communication """
+    def __init__(self,manager,screen,port=64240):
+        super().__init__()
+        self.app = ManagerNetworkAppli(screen=screen,port=port,manager=manager)
+        self.need_stop = False
+
+    def run(self):
+        while not self.need_stop:
+            self.app.run()
+
+    def stop(self):
+        self.need_stop = True
+
 
 class Scene(object):
+    """ Application running with a delay """
     def __init__(self,application,delay=10,*args,**kargs):
         self.application = application
         self.delay = delay
         self.app_args = args
         self.app_kargs = kargs
 
+    def set_manager(self,manager):
+        self.manager = manager
+
     def run(self,screen):
-        app = self.application(screen=screen,*self.app_args,**self.app_kargs)
+        self.need_stop = False
+        app = get_animation(self.application,screen)
+        self.manager.take_screen()
         app.run_bg()
-        time.sleep(self.delay)
+        sec = 0
+        while not self.need_stop and sec != self.delay:
+            time.sleep(1)
+            sec += 1
         app.stop()
         app.wait_finished()
+        self.manager.release_screen()
+
+    def stop(self):
+        self.need_stop = True
+
 
 class MatrixManager(object):
-    def __init__(self,scenario,screen=LEDMatrix):
-        self.scenario = scenario
+    def __init__(self,conf,screen):
+        self.scenario = self.load_scenario(conf)
         self.screen = screen
+        self.index_app = 0
+        self._lock = Condition()
+        self.network_appli = ThreadNetworkAppli(self,screen)
+        self.network_appli.start()
+
+    def load_scenario(self,path):
+        scenario = []
+        with open(path,"r") as f:
+            for line in f.readlines():
+                index = line.index(",")
+                time,app = line[:index],line[index+1:]
+                scene = Scene(app,int(time))
+                scene.set_manager(self)
+                scenario.append(scene)
+        return scenario
+
+    def take_screen(self):
+        self._lock.acquire()
+
+    def release_screen(self):
+        self._lock.release()
+
+    def new_external_communication(self):
+        self.scenario[self.index_app].stop()
+        self.take_screen()
+
+    def stop_external_communication(self):
+        self.release_screen()
 
     def run(self):
         while True:
-            for scene in self.scenario:
-                scene.run(self.screen)
-
-
-def get_scenario(config):
-    scenario = []
-
-    with open(config,"r") as f:
-        for line in f.readlines():
-            scene = eval(line)
-            scenario.append(scene)
-
-    return scenario
+            for self.index_app in range(len(self.scenario)):
+                self.scenario[self.index_app].run(self.screen)
 
 
 def parse_args():
@@ -62,10 +143,8 @@ def main():
     """ Entry Point Program """
     args = parse_args()
 
-    scenario = get_scenario(args.config)
-
     screen = get_screen(args.screen)
-    manager = MatrixManager(scenario,screen=screen)
+    manager = MatrixManager(args.config,screen=screen)
 
     try:
         manager.run()
@@ -74,6 +153,7 @@ def main():
     except:
         traceback.print_exc(file=sys.stdout)
     finally:
+        screen.clear()
         screen.stop()
 
     return 0
