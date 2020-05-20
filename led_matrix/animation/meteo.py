@@ -25,7 +25,7 @@ class OpenWeatherData(TextApplication):
         super().__init__(*args,**kargs)
         self.api_key = api_key
         self.city = city
-        self.font = AdaFruit(2)
+        self.font = AdaFruit(1)
 
     def update(self):
         x = urllib.request.urlopen("http://api.openweathermap.org/data/2.5/weather?APPID=%s&id=%s&units=metric" % (self.api_key,self.city))
