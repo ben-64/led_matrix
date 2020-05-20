@@ -46,8 +46,9 @@ class Application(Thread):
     def update(self):
         raise NotImplementedError()
 
-    def set_icon(self):
-        if not self.icon: return
+    def set_icon(self,icon=None):
+        if not icon: icon = self.icon
+        if not icon: return
         self.screen.image(self.icon)
         self.data_screen = self.screen.extract_screen(self.icon.width,0,self.screen.width-self.icon.width,self.screen.height)
 
