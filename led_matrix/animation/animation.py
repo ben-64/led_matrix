@@ -6,6 +6,7 @@ import time
 import random
 from threading import Thread
 from datetime import datetime
+import subprocess
 
 from led_matrix.screens.console import Console
 from led_matrix.fonts.font4x5 import Font4x5
@@ -13,11 +14,18 @@ from led_matrix.fonts.adafruit import AdaFruit
 
 
 class Application(Thread):
-    def __init__(self,screen=Console(),refresh=60):
+    def __init__(self,screen=Console(),refresh=60,icon=None):
         super().__init__()
         self.screen = screen
         self.refresh = refresh
         self.stop_received = False
+        if icon:
+            self.icon = icon
+        elif hasattr(self,"ICON"):
+            self.icon = getattr(self,"ICON")
+        else:
+            self.icon = None
+        print(self.icon)
 
     def run(self):
         self.set_icon()
@@ -39,17 +47,10 @@ class Application(Thread):
     def update(self):
         raise NotImplementedError()
 
-    def has_icon(self):
-        return hasattr(self,"ICON")
-
-    def set_icon(self,icone=None):
-        if not icone and not self.has_icon():
-            return
-        elif not icone:
-            icone = self.ICON
-        self.screen.image(icone)
-        side = int(math.sqrt(len(icone)))
-        self.data_screen = self.screen.extract_screen(side,0,self.screen.width-side,self.screen.height)
+    def set_icon(self):
+        if not self.icon: return
+        self.screen.image(self.icon)
+        self.data_screen = self.screen.extract_screen(self.icon.width,0,self.screen.width-self.icon.width,self.screen.height)
 
     def stop(self):
         self.stop_received = True
@@ -65,15 +66,23 @@ class SwitchOff(Application):
 
 
 class TextApplication(Application):
+    def __init__(self,color=0xFFFFFF,font=Font4x5(space=0),x=0,y=0,center=True,*args,**kargs):
+        super().__init__(*args,**kargs)
+        self.font = font
+        self.color = color
+        self.x = x
+        self.y = y
+        self.center = center
+
     def text_screen(self):
         return self.data_screen if hasattr(self,"data_screen") else self.screen
 
-    def print_text(self,text,color=0xFFFFFF,font=Font4x5(0),x=0,y=0,center=True):
+    def print_text(self,text):
         self.text_screen().fill(self.screen.DEFAULT_COLOR)
-        if center:
-            self.text_screen().center_text(text,color,font=font)
+        if self.center:
+            self.text_screen().center_text(text,self.color,font=self.font)
         else:
-            self.text_screen().text(text,x,y,color,font)
+            self.text_screen().text(text,self.x,self.y,self.color,self.font)
         self.screen.render()
 
 
@@ -83,8 +92,6 @@ class ScrollText(TextApplication):
         self.letter_by_letter = letter_by_letter
         self.indice_start = 0
         self.indice_end = None
-        self.x = 0
-        self.font = Font4x5()
         self.speed = speed
         self.if_needed = if_needed
         self.infinite = infinite
@@ -97,7 +104,7 @@ class ScrollText(TextApplication):
         if self.font.width(text) > self.text_screen().width:
             self.scroll(text)
         else:
-            self.print_text(text,center=True,font=self.font)
+            self.print_text(text)
 
     def scroll(self,text):
         stop = False
@@ -192,6 +199,16 @@ class SmallClock(TextApplication):
     def update(self):
         self.print_text(datetime.now().strftime("%H:%M"))
 
+
+class ExternalCommand(ScrollText):
+    def __init__(self,cmd,*args,**kargs):
+        super().__init__(*args,**kargs)
+        self.cmd = cmd
+
+    def set_text(self):
+        print(self.cmd)
+        return subprocess.check_output(self.cmd,shell=True).decode("utf-8").strip()
+        
 
 class Animation(Application):
     pass
