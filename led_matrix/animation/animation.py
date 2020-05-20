@@ -167,9 +167,10 @@ class ProgressBar(object):
 class Clock(TextApplication):
     def __init__(self,*args,**kargs):
         super().__init__(refresh=1,*args,**kargs)
-        self.icon_screen = self.screen.extract_screen(0,0,8,self.screen.height)
-        self.time_screen = self.screen.extract_screen(8,0,self.screen.width-8,self.screen.height-1)
-        self.second_screen = self.screen.extract_screen(8,7,self.screen.width-8,1)
+        sz_icon = 9
+        self.icon_screen = self.screen.extract_screen(0,0,sz_icon,self.screen.height)
+        self.time_screen = self.screen.extract_screen(sz_icon,0,self.screen.width-sz_icon,self.screen.height-1)
+        self.second_screen = self.screen.extract_screen(sz_icon,7,self.screen.width-sz_icon,1)
         self.bartimer = ProgressBar(self.second_screen,60)
 
     def set_icon(self):
@@ -179,7 +180,7 @@ class Clock(TextApplication):
                 else: color = 0xFFFFFF
                 self.icon_screen[(x,y)] = color
         day = datetime.now().strftime("%d").lstrip("0")
-        self.icon_screen.hcenter_text(day,color=0,font=Font4x5(0),y=2)
+        self.icon_screen.text(day,color=0,font=Font4x5(0),x=1,y=2)
 
     def update(self):
         # Time
