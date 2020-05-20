@@ -60,7 +60,7 @@ class Application(Thread):
 
 class SwitchOff(Application):
     def run(self):
-        self.screen.colorwipe()
+        self.screen.clear()
         self.screen.render()
 
 
