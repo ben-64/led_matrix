@@ -109,7 +109,7 @@ class ScrollText(TextApplication):
     def scroll(self,text):
         stop = False
         while not self.stop_received and not stop:
-            self.print_text(text[self.indice_start:self.indice_end],center=False,x=self.x,font=self.font)
+            self.print_text(text[self.indice_start:self.indice_end])
             if not self.letter_by_letter or self.indice_end is None:
                 self.indice_start += 1
                 if self.indice_start > len(text):
