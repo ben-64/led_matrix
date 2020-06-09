@@ -4,8 +4,11 @@
 import random
 import time
 import colorsys
+import struct
+
 from led_matrix.fonts.adafruit import *
 from led_matrix.animation.animation import Animation
+from led_matrix.animation.network_app import NetworkApplication
 
 
 def hsv2rgb(h,s,v):
@@ -42,12 +45,15 @@ class Fire(Animation):
             time.sleep(0.05)
 
 
-class MagicFire(Animation):
+class MagicFire(NetworkApplication):
     def __init__(self,hue=10,saturation=100,*args,**kargs):
         super().__init__(*args,**kargs)
         self.hue = hue
         self.saturation = saturation
         self.heat = [[0 for x in range(self.screen.width)] for y in range(self.screen.height)] 
+
+    def on_receive(self,data):
+        self.hue = struct.unpack("<H",data)[0]
 
     def set_pixel_heat(self,x,y,heat,max_heat=255):
         base_h = self.hue
@@ -71,7 +77,6 @@ class MagicFire(Animation):
         r,g,b = hsv2rgb(h,s,v)
         color = (r<<16) | (g<<8) | b
         self.screen[(x,y)] = color
-
 
     def fire_line(self,cooling,sparkling,line):
         dir = 1
