@@ -74,7 +74,7 @@ class BarThread(Thread):
 
 
 class NetQuizz(Application):
-    def __init__(self,conf=None,port=64241,timeout=10,wait_timeout=True,max_size_answser=None,*args,**kargs):
+    def __init__(self,conf=None,port=64241,timeout=10,wait_timeout=True,max_size_answser=None,timeout_bar=True,*args,**kargs):
         super().__init__(refresh=1,*args,**kargs)
         self.timeout = timeout
         self.queue = queue.Queue(maxsize=10)
@@ -85,6 +85,7 @@ class NetQuizz(Application):
         self.wait_timeout = wait_timeout
         self.question_screen = self.screen.extract_screen(0,0,22,self.screen.height)
         self.answer_screen = self.screen.extract_screen(22,0,10,self.screen.height)
+        self.timeout_bar = timeout_bar
         if conf:
             self.load_conf(conf)
 
@@ -126,7 +127,7 @@ class NetQuizz(Application):
         self.screen.render()
 
     def validate_answer(self,answer):
-        self.stop_timeout_bar()
+        if self.timeout_bar: self.stop_timeout_bar()
         if self.is_valid_answer(answer):
             self.set_right()
         else:
@@ -154,7 +155,7 @@ class NetQuizz(Application):
     def get_answser(self):
         remaining_time = self.timeout
         answser = b""
-        self.start_timeout_bar()
+        if self.timeout_bar: self.start_timeout_bar()
         while True:
             try:
                 start = time.time()
