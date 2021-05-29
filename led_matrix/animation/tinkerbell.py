@@ -147,7 +147,7 @@ class Glow(StepEffect):
 
 class TinkerBell(Animation):
     class Firefly(object):
-        def __init__(self,x,y,screen,color=275):
+        def __init__(self,x,y,screen,color=170):
             self.x = x
             self.y = y
             self.particles = []
@@ -172,8 +172,8 @@ class TinkerBell(Animation):
             self.screen[(x,y)] = hsv2rgb_value(self.hue,100,brightness)
 
         def get_glow_coordinates(self):
-            for i in (0,):
-                for j in (0,):
+            for i in (-1,0,1):
+                for j in (-1,0,1):
                     if self.in_screen(self.x+i,self.y+j):
                         if (i,j) != (0,0) and (abs(i),abs(j)) != (1,1):
                             yield (self.x+i,self.y+j)
@@ -223,10 +223,10 @@ class TinkerBell(Animation):
             br = 60
             if dx != 0 or dy != 0:
                 particle = Particle(self.x,self.y,self.screen)
-                self.add_particle(particle,DimOff(every=250,step=5))
+                self.add_particle(particle,DimOff(every=200,step=1))
                 for i,j in self.get_glow_coordinates():
                     particle = Particle(i,j,self.screen)
-                    self.add_particle(particle,DimOff(every=250,step=5))
+                    self.add_particle(particle,DimOff(every=200,step=1))
 #            if dx > 0:
 #                self.add_trace(self.x,self.y+1,br)
 #                self.add_trace(self.x,self.y-1,br)
@@ -245,7 +245,7 @@ class TinkerBell(Animation):
                 particle.run()
 
         def update(self):
-            if random.randint(0,1000) > 900 and time.time()*100-self.last_move > 50:
+            if random.randint(0,1000) > 500 and time.time()*100-self.last_move > 10:
                 self.move()
                 pass
             self.update_particles()
@@ -256,7 +256,7 @@ class TinkerBell(Animation):
 
     def run(self):
         #fireflies = [TinkerBell.Firefly(0,0,self.screen),TinkerBell.Firefly(6,6,self.screen)]
-        fireflies = [TinkerBell.Firefly(7,7,self.screen,color=275)]
+        fireflies = [TinkerBell.Firefly(7,7,self.screen,color=175)]
         for firefly in fireflies:
             firefly.init()
         while not self.stop_received:
