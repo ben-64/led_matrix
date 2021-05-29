@@ -17,6 +17,7 @@ def parse_args():
     parser.add_argument("--icon","-i",metavar="ICON",help="Icon to display")
     parser.add_argument("--color","-c",metavar="COLOR",default=0xFFFFFF,type=lambda x:int(x,0),help="COLOR")
     parser.add_argument("--wait","-w",metavar="SECONDS",default=10,type=int,help="Wait before exit")
+    parser.add_argument("--stdin",action="store_true",help="Text to display is received on stdin")
     return parser.parse_args()
 
 def main():
@@ -34,7 +35,8 @@ def main():
     else:
         data_screen = screen
     
-    data_screen.center_text(args.text,args.color,font=Font4x5(space=0))
+    text = sys.stdin.readlines()[0].rstrip() if args.stdin else args.text
+    data_screen.center_text(text,args.color,font=Font4x5(space=0))
 
     screen.render()
 
